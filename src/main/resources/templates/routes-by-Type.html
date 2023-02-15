@@ -1,0 +1,39 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pathfinder</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/mobile.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+          integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+
+</head>
+<body>
+<div class="wrapper">
+    <!-- Navigation -->
+    <div th:replace="~{fragments/navbar}">Navbar</div>
+
+    <section th:each="r : ${routes}" class="road">
+        <div>
+            <h2 th:text="${r.name}"></h2>
+            <p th:text="${r.description}"></p>
+            <a th:href="@{/routes/details/{id}(id=${r.id})}" class="btn">Learn More</a>
+        </div>
+        <img th:each="pic : ${pictures}" th:if="${pic.routeId.longValue() == r.id.longValue()}"
+             th:src="${pic.url}" alt="Title image"/>
+    </section>
+</div>
+<!-- Wrapper Ends -->
+</body>
+<footer class="footer bg-blur rounded">
+    <div class="container-fluid text-center">
+        <div class="h5 text-white">
+            &copy; Lucho, Chocho & Spring Advanced Students 2021. All rights reserved.
+        </div>
+    </div>
+</footer>
+</html>

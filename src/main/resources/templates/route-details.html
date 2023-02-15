@@ -1,0 +1,141 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pathfinder</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/mobile.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+          integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+          integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+            crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.4.0/gpx.min.js"></script>
+    <script src="/js/processPicInput.js"></script>
+
+</head>
+<body>
+<div class="wrapper">
+
+    <div th:replace="~{fragments/navbar}">Navbar</div>
+
+    <div class="details-main">
+        <section class="route-info text-center">
+            <h4 th:text="${routeDetails.name}" id="track-name"></h4>
+            <p th:text="'Total distance: ' + ${#numbers.formatDecimal(routeDetails.totalDistance, 1, 3)} + ' km'"><span
+                    id="totalDistance"></span></p>
+            <p th:text="'Author name: ' + ${routeDetails.authorUsername}"><span id="authorName"></span></p>
+            <h4 th:text="'Difficulty level: ' + ${routeDetails.level}"></h4>
+            <div class="d-flex justify-content-center">
+                <p><img class="level-img" src="/images/difficulty-level.png" alt=""></p>
+            </div>
+            <div>
+                <h4>Choose picture</h4>
+                <form onsubmit="return isPicture()" th:action="@{/pictures/upload}" th:method="POST"
+                      th:object="${pictureModel}"
+                      enctype="multipart/form-data">
+
+                    <div class="form-group">
+                        <label>
+                            <input th:field="*{title}" type="text" name="title">
+                        </label>
+                    </div>
+                    <div class="image-upload">
+                        <label for="picture">
+                            <img id="previewImage" src="/images/add-img.png" alt=""/>
+                        </label>
+                        <input onchange="picToString()" style="display: none" id="picture" type="file" name="picture"/>
+                        <input th:field="*{url}" type="hidden" id="picString">
+                        <strong id="pictureRequiredError" style="display: none" class="form-text bg-danger rounded">A
+                            picture must be
+                            selected.</strong>
+                        <strong id="pictureFormatError" style="display: none" class="form-text bg-danger rounded">Must
+                            be valid picture
+                            format.</strong>
+                        <strong th:if="${userNotLoggedIn}" th:text="${userNotLoggedIn}"
+                                class="form-text bg-danger rounded"></strong>
+                        <strong th:if="${#fields.hasErrors('title')}" th:errors="*{title}"
+                                class="form-text bg-danger rounded"></strong>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn-primary rounded mt-2">Upload Picture</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+        <div id="map" style="height: 500px">
+            <input type="hidden" id="gpxCoords" th:value="${routeDetails.gpxCoordinates}"/>
+            <script src="/js/map.js"></script>
+        </div>
+        <section th:if="${routeDetails.videoUrl != null && routeDetails.videoUrl.trim().length() > 0}" id="video">
+            <iframe id="frame" th:src="'https://www.youtube.com/embed/' + ${routeDetails.videoUrl}"></iframe>
+        </section>
+        <section class="route-description text-center">
+            <h4>Description:</h4>
+            <p th:text="${routeDetails.description}" id="route-description"></p>
+        </section>
+        <section class="gallery">
+            <img class="rounded" th:each="pic : ${pictures}" th:src="${pic.url}" height="50%" alt="">
+            <img class="rounded" th:if="${pictures.isEmpty()}" src="/images/pic1.jpg" height="100%" alt="">
+            <img class="rounded" th:if="${pictures.isEmpty()}" src="/images/pic3.jpg" height="100%" alt="">
+        </section>
+        <section class="comments">
+            <h1>Comments</h1>
+
+            <div>
+                <!-- Comments submission -->
+                <form id="commentForm" method="POST"
+                      action="/">
+                    <div class="form-group">
+                        <h4>Leave a comment</h4>
+                        <label for="message">Message</label>
+                        <textarea name="message"
+                                  id="message"
+                                  cols="30"
+                                  rows="5"
+                                  class="form-control"
+                                  style="background-color: white;"></textarea>
+                        <small id="messageError" class="invalid-feedback">
+                            Message should be at least 10 characters.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit"
+                               class="btn"
+                               id="postComment"
+                               value="Post Comment"/>
+                    </div>
+                </form>
+                <!-- Comments submission -->
+            </div>
+
+            <!-- All comments section -->
+            <div>
+
+                <span id="commentCtnr"><!-- Comments section, filled in by script --></span>
+            </div>
+            <!-- EO: All comments section -->
+        </section>
+        <p style="visibility: hidden">GPX Download: <a id="gpxDownload"></a></p>
+    </div>
+    <!-- Scripts: track and comments
+    <script th:src="@{/js/track.js}"></script>
+    <script th:src="@{/js/comments.js}"></script>
+    -->
+</div>
+<footer class="footer bg-blur rounded">
+    <div class="container-fluid text-center">
+        <div class="h5 text-white">
+            &copy; Lucho, Chocho & Spring Advanced Students 2021. All rights reserved.
+        </div>
+    </div>
+</footer>
+</body>
+</html>
