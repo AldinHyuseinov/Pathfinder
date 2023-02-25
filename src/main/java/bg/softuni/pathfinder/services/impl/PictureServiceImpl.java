@@ -8,7 +8,6 @@ import bg.softuni.pathfinder.repositories.PictureRepository;
 import bg.softuni.pathfinder.repositories.RouteRepository;
 import bg.softuni.pathfinder.repositories.UserRepository;
 import bg.softuni.pathfinder.services.interfaces.PictureService;
-import bg.softuni.pathfinder.util.user.CurrentUser;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +27,15 @@ public class PictureServiceImpl implements PictureService {
 
     private final UserRepository userRepository;
 
-    private final CurrentUser currentUser;
-
     private final ModelMapper mapper;
 
     @Override
     @Transactional
-    public void addPicture(AddPictureDTO pictureDTO) {
+    public void addPicture(AddPictureDTO pictureDTO, String username) {
         Picture picture = mapper.map(pictureDTO, Picture.class);
         picture.setId(null);
         picture.setRoute(routeRepository.findById(pictureDTO.getTrackId()).orElse(null));
-        picture.setAuthor(userRepository.findById(currentUser.getId()).orElse(null));
+        picture.setAuthor(userRepository.findByUsername(username).orElse(null));
 
         Picture existingPicture = pictureRepository.findByUrl(picture.getUrl());
 

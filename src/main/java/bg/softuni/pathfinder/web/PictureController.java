@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class PictureController {
 
     @PostMapping("/upload")
     public String uploadPicture(@Valid AddPictureDTO pictureModel, BindingResult bindingResult,
-                                RedirectAttributes redirectAttributes, HttpSession httpSession) {
+                                RedirectAttributes redirectAttributes, HttpSession httpSession, Authentication auth) {
         boolean isValid = false;
 
         if (bindingResult.hasErrors()) {
@@ -28,7 +29,7 @@ public class PictureController {
             redirectAttributes.addFlashAttribute("pictureModel", pictureModel);
         }
 
-        if (httpSession.getAttribute("userSession") == null) {
+        if (auth == null) {
             redirectAttributes.addFlashAttribute("userNotLoggedIn", "You must login to post a picture.");
         } else {
             isValid = true;
@@ -37,7 +38,7 @@ public class PictureController {
 
         if (isValid) {
             pictureModel.setTrackId(routeId);
-            pictureService.addPicture(pictureModel);
+            pictureService.addPicture(pictureModel, auth.getName());
         }
         return "redirect:/routes/details/" + routeId;
     }

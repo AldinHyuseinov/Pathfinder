@@ -19,19 +19,16 @@
         <div class="row g-3 align-items-center">
 
             <form th:action="@{/users/login}"
-                  th:method="post" th:object="${userLoginDTO}">
-                <div th:if="${#fields.hasErrors('*')}" th:each="err : ${#fields.errors('*')}">
-                    <strong th:text="${err}" class="text-danger">Error message</strong>
-                </div>
+                  th:method="post">
                 <br/>
-                <strong th:if="${invalidUser}" th:text="${invalidUser}" class="text-danger"></strong>
+                <strong th:if="${error}" th:text="${error}" class="text-danger"></strong>
 
                 <div>
                     <div class="col-auto">
                         <label for="inputUsername" class="col-form-label ">Username</label>
                     </div>
                     <div class="col-auto">
-                        <input th:field="*{username}" type="text"
+                        <input type="text"
                                name="username"
                                id="inputUsername"
                                class="form-control"
@@ -43,7 +40,7 @@
                         <label for="inputPassword" class="col-form-label ">Password</label>
                     </div>
                     <div class="col-auto">
-                        <input th:field="*{password}" type="password"
+                        <input type="password"
                                name="password"
                                id="inputPassword" class="form-control"
                                aria-describedby="passwordHelpInline">

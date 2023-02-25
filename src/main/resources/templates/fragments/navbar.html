@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Navbar</title>
@@ -12,25 +12,25 @@
             <li>
                 <a href="/home">Home</a>
             </li>
-            <li th:if="${session.userSession == null}">
+            <li sec:authorize="!isAuthenticated()">
                 <a href="/users/login">Login</a>
             </li>
-            <li th:if="${session.userSession == null}">
+            <li sec:authorize="!isAuthenticated()">
                 <a href="/users/register">Register</a>
             </li>
-            <li th:if="${session.userSession == null}">
+            <li sec:authorize="!isAuthenticated()">
                 <a href="/home/about">About</a>
             </li>
-            <li th:if="${session.userSession != null}">
+            <li sec:authorize="isAuthenticated()">
                 <a href="/routes/add">Add new route</a>
             </li>
-            <li th:if="${session.userSession != null}">
+            <li sec:authorize="isAuthenticated()">
                 <a href="/users/profile">Profile</a>
             </li>
-            <li th:if="${session.userSession != null && session.userSession.role == T(bg.softuni.pathfinder.models.enums.RoleType).ADMIN}">
-                <a href="/">Admin</a>
+            <li sec:authorize="hasRole('ROLE_ADMIN')">
+                <a href="/users/admin">Admin</a>
             </li>
-            <li th:if="${session.userSession != null}">
+            <li sec:authorize="isAuthenticated()">
                 <a href="/users/logout">Logout</a>
             </li>
         </ul>

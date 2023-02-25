@@ -9,11 +9,8 @@ import bg.softuni.pathfinder.models.enums.RoleType;
 import java.util.Optional;
 
 public interface UserService {
-    Optional<User> loginUser(UserLoginDTO userLoginDTO);
 
     void registerUser(UserRegisterDTO userRegisterDTO);
 
-    RoleType userRole(Long userId);
-
-    UserProfileDTO userProfile(Long userId);
+    UserProfileDTO userProfile(String username);
 }

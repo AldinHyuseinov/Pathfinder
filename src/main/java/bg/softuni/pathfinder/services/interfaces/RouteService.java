@@ -8,7 +8,7 @@ import bg.softuni.pathfinder.models.enums.CategoryType;
 import java.util.List;
 
 public interface RouteService {
-    void addRoute(AddRouteDTO addRouteDTO);
+    void addRoute(AddRouteDTO addRouteDTO, String name);
 
     List<RouteInfoDTO> allRoutes();
 

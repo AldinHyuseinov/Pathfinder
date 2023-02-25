@@ -7,7 +7,7 @@ import bg.softuni.pathfinder.models.enums.CategoryType;
 import java.util.List;
 
 public interface PictureService {
-    void addPicture(AddPictureDTO pictureDTO);
+    void addPicture(AddPictureDTO pictureDTO, String username);
 
     List<PictureDTO> allDistinctPictures();
 

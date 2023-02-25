@@ -1,6 +1,5 @@
 package bg.softuni.pathfinder.services.impl;
 
-import bg.softuni.pathfinder.models.dto.UserLoginDTO;
 import bg.softuni.pathfinder.models.dto.UserProfileDTO;
 import bg.softuni.pathfinder.models.dto.UserRegisterDTO;
 import bg.softuni.pathfinder.models.entities.Role;
@@ -13,9 +12,9 @@ import bg.softuni.pathfinder.services.interfaces.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -28,15 +27,13 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper mapper;
 
-    @Override
-    public Optional<User> loginUser(UserLoginDTO userLoginDTO) {
-        return userRepository.findByUsernameAndPassword(userLoginDTO.getUsername(), userLoginDTO.getPassword());
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void registerUser(UserRegisterDTO userRegisterDTO) {
         User user = mapper.map(userRegisterDTO, User.class);
         user.setLevel(Level.BEGINNER);
+        user.setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
         userRepository.saveAndFlush(user);
 
         Role role = new Role();
@@ -46,13 +43,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RoleType userRole(Long userId) {
-        return roleRepository.findByUser(userId).getName();
-    }
-
-    @Override
-    public UserProfileDTO userProfile(Long userId) {
-        return mapper.map(userRepository.findById(userId), UserProfileDTO.class);
+    public UserProfileDTO userProfile(String username) {
+        return mapper.map(userRepository.findByUsername(username), UserProfileDTO.class);
     }
 
 }

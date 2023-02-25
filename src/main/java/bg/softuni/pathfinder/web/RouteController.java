@@ -15,6 +15,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/routes")
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -46,7 +48,7 @@ public class RouteController {
 
     @PostMapping("/add")
     public String addRoute(@Valid AddRouteDTO routeModel, BindingResult bindingResult,
-                           RedirectAttributes redirectAttributes) {
+                           RedirectAttributes redirectAttributes, Principal principal) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.routeModel", bindingResult);
@@ -54,7 +56,7 @@ public class RouteController {
 
             return "redirect:/routes/add";
         }
-        routeService.addRoute(routeModel);
+        routeService.addRoute(routeModel, principal.getName());
 
         return "redirect:/routes/all";
     }

@@ -11,7 +11,6 @@ import bg.softuni.pathfinder.repositories.UserRepository;
 import bg.softuni.pathfinder.services.interfaces.RouteService;
 import bg.softuni.pathfinder.util.gpxparsing.GpxParser;
 import bg.softuni.pathfinder.util.gpxparsing.TrackPoint;
-import bg.softuni.pathfinder.util.user.CurrentUser;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +28,12 @@ public class RouteServiceImpl implements RouteService {
 
     private final UserRepository userRepository;
 
-    private final CurrentUser currentUser;
-
     private final ModelMapper mapper;
 
     @Override
-    public void addRoute(AddRouteDTO addRouteDTO) {
+    public void addRoute(AddRouteDTO addRouteDTO, String name) {
         Route route = mapper.map(addRouteDTO, Route.class);
-        route.setAuthor(userRepository.findById(currentUser.getId()).orElse(null));
+        route.setAuthor(userRepository.findByUsername(name).orElse(null));
         route.getCategories().add(categoryRepository.findByName(addRouteDTO.getType()));
 
         routeRepository.saveAndFlush(route);
